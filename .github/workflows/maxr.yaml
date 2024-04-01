@@ -24,7 +24,7 @@ jobs:
         git remote add upstream https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
         git fetch upstream
 
-    - name: Rebase to Kernel 4.15
+    - name: Rebase to Kernel 4.14
       run: |
         git checkout -b kernel-4.14-upstreaming
         git rebase upstream/linux-4.14.y
@@ -39,5 +39,5 @@ jobs:
     - name: Upload Upstreamed Source as Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: Kernel-4.15-Upstreamed-Source
+        name: Kernel-4.14-Upstreamed-Source
         path: kernel-4.15-upstream.zip
