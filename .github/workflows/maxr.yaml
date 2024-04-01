@@ -1,4 +1,4 @@
-name: Upstream Kernel to 4.15
+name: Upstream Kernel to 4.14
 
 on:
   schedule:
