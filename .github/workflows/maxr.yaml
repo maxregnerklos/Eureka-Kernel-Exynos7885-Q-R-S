@@ -1,0 +1,43 @@
+name: Upstream Kernel to 4.15
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every day
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  upstream-kernel:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Current Repository
+      uses: actions/checkout@v2
+
+    - name: Configure Git
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+
+    - name: Fetch Upstream Kernel
+      run: |
+        git remote add upstream https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+        git fetch upstream
+
+    - name: Rebase to Kernel 4.15
+      run: |
+        git checkout -b kernel-4.15-upstreaming
+        git rebase upstream/linux-4.15.y
+      continue-on-error: true
+
+    - name: Zip Upstreamed Source
+      run: |
+        git archive --format=zip --output=kernel-4.15-upstream.zip HEAD
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Upstreamed Source as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Kernel-4.15-Upstreamed-Source
+        path: kernel-4.15-upstream.zip
