@@ -26,13 +26,13 @@ jobs:
 
     - name: Rebase to Kernel 4.15
       run: |
-        git checkout -b kernel-4.15-upstreaming
-        git rebase upstream/linux-4.15.y
+        git checkout -b kernel-4.14-upstreaming
+        git rebase upstream/linux-4.14.y
       continue-on-error: true
 
     - name: Zip Upstreamed Source
       run: |
-        git archive --format=zip --output=kernel-4.15-upstream.zip HEAD
+        git archive --format=zip --output=kernel-4.14-upstream.zip HEAD
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
