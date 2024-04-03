@@ -40,7 +40,9 @@ jobs:
       run: |
         git remote add port_repo $GITHUB_WORKSPACE
         git fetch port_repo
-        git cherry-pick $(git rev-list --reverse HEAD..port_repo/$GITHUB_SHA)
+        for commit in $(git log --format="%H" HEAD..port_repo/${{ github.sha }}); do
+          git cherry-pick $commit || git cherry-pick --abort
+        done
 
     - name: Zip modified kernel source
       run: zip -r modified_kernel_source.zip .
