@@ -2,8 +2,19 @@ name: Port Kernel Commits
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *' # Runs everyday at midnight
+    inputs:
+      base_kernel_repo:
+        description: 'Base kernel repository'
+        required: true
+      base_branch:
+        description: 'Base branch'
+        required: true
+      port_kernel_repo:
+        description: 'Port kernel repository'
+        required: true
+      port_branch:
+        description: 'Port branch'
+        required: true
 
 jobs:
   port_kernel_commits:
@@ -13,14 +24,14 @@ jobs:
     - name: Checkout base kernel source
       uses: actions/checkout@v2
       with:
-        repository: <base_kernel_repo>
-        ref: <base_branch> # Specify the branch you want to clone
+        repository: ${{ github.event.inputs.base_kernel_repo }}
+        ref: ${{ github.event.inputs.base_branch }}
 
     - name: Checkout port kernel source
       uses: actions/checkout@v2
       with:
-        repository: <port_kernel_repo>
-        ref: <port_branch> # Specify the branch you want to clone
+        repository: ${{ github.event.inputs.port_kernel_repo }}
+        ref: ${{ github.event.inputs.port_branch }}
 
     - name: Fetch commits from port kernel source
       run: git fetch --unshallow
