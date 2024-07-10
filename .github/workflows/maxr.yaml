@@ -15,6 +15,9 @@ on:
       port_branch:
         description: 'Port branch'
         required: true
+      new_branch:
+        description: 'New branch for ported commits'
+        required: true
 
 jobs:
   port_kernel_commits:
@@ -26,29 +29,32 @@ jobs:
       with:
         repository: ${{ github.event.inputs.base_kernel_repo }}
         ref: ${{ github.event.inputs.base_branch }}
+        path: base_kernel
 
     - name: Checkout port kernel source
       uses: actions/checkout@v2
       with:
         repository: ${{ github.event.inputs.port_kernel_repo }}
         ref: ${{ github.event.inputs.port_branch }}
+        path: port_kernel
 
     - name: Fetch commits from port kernel source
-      run: git fetch --unshallow
+      run: |
+        cd port_kernel
+        git fetch --unshallow
 
     - name: Apply port kernel commits to base kernel
       run: |
-        git remote add port_repo $GITHUB_WORKSPACE
+        cd base_kernel
+        git remote add port_repo ../port_kernel
         git fetch port_repo
         for commit in $(git log --format="%H" HEAD..port_repo/${{ github.sha }}); do
           git cherry-pick $commit || git cherry-pick --abort
         done
 
-    - name: Zip modified kernel source
-      run: zip -r modified_kernel_source.zip .
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: modified_kernel_source
-        path: modified_kernel_source.zip
+    - name: Create new branch and push changes
+      run: |
+        cd base_kernel
+        git checkout -b ${{ github.event.inputs.new_branch }}
+        git push origin ${{ github.event.inputs.new_branch }}
+        echo "Pushed changes to new branch: ${{ github.event.inputs.new_branch }}"
